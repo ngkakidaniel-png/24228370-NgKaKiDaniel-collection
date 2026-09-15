@@ -3,13 +3,13 @@
   "records": [
     {
       "id": "REC-001",
-      "title": "Tulip, third day",
+      "title": "First Recorded Result",
       "type": "image",
-      "file": "media/tulip-01.jpg",
-      "date": "2026-08-12",
-      "place": "kitchen table",
-      "recorder": "Echo",
-      "not_captured": "how far it had already opened that morning",
+      "file": "20230221_1816.jpg",
+      "date": "2023-02-11",
+      "place": "Cheung Sha Wan Game Centre",
+      "recorder": "Daniel Ng",
+      "not_captured": "The Excited feeling of getting an S score for the first time, the reaction of the friend playing together",
       "certainty": 4
     },
     {
@@ -33,6 +33,193 @@
       "recorder": "Echo",
       "not_captured": "her tone. I have written the words but not the way she said them.",
       "certainty": 2
+    },
+    {
+      "id": "REC-004",
+      "title": "Specimen Title 04",
+      "type": "text",
+      "file": "media/description.txt",
+      "date": "2026-08-13",
+      "place": "Placeholder Location",
+      "recorder": "Echo",
+      "not_captured": "exact ambient noise level",
+      "certainty": 3
+    },
+    {
+      "id": "REC-005",
+      "title": "Specimen Title 05",
+      "type": "text",
+      "file": "media/description.txt",
+      "date": "2026-08-13",
+      "place": "Placeholder Location",
+      "recorder": "Echo",
+      "not_captured": "slight shift in lighting",
+      "certainty": 3
+    },
+    {
+      "id": "REC-006",
+      "title": "Specimen Title 06",
+      "type": "text",
+      "file": "media/description.txt",
+      "date": "2026-08-14",
+      "place": "Placeholder Location",
+      "recorder": "Echo",
+      "not_captured": "temperature fluctuation",
+      "certainty": 3
+    },
+    {
+      "id": "REC-007",
+      "title": "Specimen Title 07",
+      "type": "text",
+      "file": "media/description.txt",
+      "date": "2026-08-14",
+      "place": "Placeholder Location",
+      "recorder": "Echo",
+      "not_captured": "wind direction outside",
+      "certainty": 3
+    },
+    {
+      "id": "REC-008",
+      "title": "Specimen Title 08",
+      "type": "text",
+      "file": "media/description.txt",
+      "date": "2026-08-15",
+      "place": "Placeholder Location",
+      "recorder": "Echo",
+      "not_captured": "surface texture details",
+      "certainty": 3
+    },
+    {
+      "id": "REC-009",
+      "title": "Specimen Title 09",
+      "type": "text",
+      "file": "media/description.txt",
+      "date": "2026-08-15",
+      "place": "Placeholder Location",
+      "recorder": "Echo",
+      "not_captured": "faint background hum",
+      "certainty": 3
+    },
+    {
+      "id": "REC-010",
+      "title": "Specimen Title 10",
+      "type": "text",
+      "file": "media/description.txt",
+      "date": "2026-08-16",
+      "place": "Placeholder Location",
+      "recorder": "Echo",
+      "not_captured": "speed of movement",
+      "certainty": 3
+    },
+    {
+      "id": "REC-011",
+      "title": "Specimen Title 11",
+      "type": "text",
+      "file": "media/description.txt",
+      "date": "2026-08-16",
+      "place": "Placeholder Location",
+      "recorder": "Echo",
+      "not_captured": "subtle color gradients",
+      "certainty": 3
+    },
+    {
+      "id": "REC-012",
+      "title": "Specimen Title 12",
+      "type": "text",
+      "file": "media/description.txt",
+      "date": "2026-08-17",
+      "place": "Placeholder Location",
+      "recorder": "Echo",
+      "not_captured": "precise moisture level",
+      "certainty": 3
+    },
+    {
+      "id": "REC-013",
+      "title": "Specimen Title 13",
+      "type": "text",
+      "file": "media/description.txt",
+      "date": "2026-08-17",
+      "place": "Placeholder Location",
+      "recorder": "Echo",
+      "not_captured": "duration of shadow cast",
+      "certainty": 3
+    },
+    {
+      "id": "REC-014",
+      "title": "Specimen Title 14",
+      "type": "text",
+      "file": "media/description.txt",
+      "date": "2026-08-18",
+      "place": "Placeholder Location",
+      "recorder": "Echo",
+      "not_captured": "internal resonance",
+      "certainty": 3
+    },
+    {
+      "id": "REC-015",
+      "title": "Specimen Title 15",
+      "type": "text",
+      "file": "media/description.txt",
+      "date": "2026-08-18",
+      "place": "Placeholder Location",
+      "recorder": "Echo",
+      "not_captured": "air pressure shift",
+      "certainty": 3
+    },
+    {
+      "id": "REC-016",
+      "title": "Specimen Title 16",
+      "type": "text",
+      "file": "media/description.txt",
+      "date": "2026-08-19",
+      "place": "Placeholder Location",
+      "recorder": "Echo",
+      "not_captured": "transient scent trail",
+      "certainty": 3
+    },
+    {
+      "id": "REC-017",
+      "title": "Specimen Title 17",
+      "type": "text",
+      "file": "media/description.txt",
+      "date": "2026-08-19",
+      "place": "Placeholder Location",
+      "recorder": "Echo",
+      "not_captured": "micro-vibrations",
+      "certainty": 3
+    },
+    {
+      "id": "REC-018",
+      "title": "Specimen Title 18",
+      "type": "text",
+      "file": "media/description.txt",
+      "date": "2026-08-20",
+      "place": "Placeholder Location",
+      "recorder": "Echo",
+      "not_captured": "instantaneous warmth",
+      "certainty": 3
+    },
+    {
+      "id": "REC-019",
+      "title": "Specimen Title 19",
+      "type": "text",
+      "file": "media/description.txt",
+      "date": "2026-08-20",
+      "place": "Placeholder Location",
+      "recorder": "Echo",
+      "not_captured": "organic decay rate",
+      "certainty": 3
+    },
+    {
+      "id": "REC-020",
+      "title": "Specimen Title 20",
+      "type": "text",
+      "file": "media/description.txt",
+      "date": "2026-08-21",
+      "place": "Placeholder Location",
+      "recorder": "Echo",
+      "not_captured": "final echo of the room",
+      "certainty": 3
     }
   ]
 }
