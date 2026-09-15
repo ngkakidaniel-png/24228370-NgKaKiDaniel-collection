@@ -1,0 +1,38 @@
+{
+  "collection": "ARTT3005 — starter",
+  "records": [
+    {
+      "id": "REC-001",
+      "title": "Tulip, third day",
+      "type": "image",
+      "file": "media/tulip-01.jpg",
+      "date": "2026-08-12",
+      "place": "kitchen table",
+      "recorder": "Echo",
+      "not_captured": "how far it had already opened that morning",
+      "certainty": 4
+    },
+    {
+      "id": "REC-002",
+      "title": "Kitchen, before dinner",
+      "type": "sound",
+      "file": "media/kitchen.mp3",
+      "date": "2026-08-12",
+      "place": "my aunt's flat",
+      "recorder": "Echo",
+      "not_captured": "the smell, and how hot the room was",
+      "certainty": 3
+    },
+    {
+      "id": "REC-003",
+      "title": "What she said about the soup",
+      "type": "text",
+      "file": "media/description.txt",
+      "date": "2026-08-12",
+      "place": "my aunt's flat",
+      "recorder": "Echo",
+      "not_captured": "her tone. I have written the words but not the way she said them.",
+      "certainty": 2
+    }
+  ]
+}
