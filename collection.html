@@ -8,9 +8,32 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
   <style>
     body {
       font-family: 'Inter', sans-serif;
+    }
+
+    /* Custom dark scrollbar for WebKit browsers (Chrome, Safari, Edge) */
+    ::-webkit-scrollbar {
+      height: 8px;
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #020617; /* slate-950 */
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155; /* slate-700 */
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569; /* slate-600 */
+    }
+
+    /* Firefox scrollbar support */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #334155 #020617;
     }
 
     .card {
@@ -47,12 +70,12 @@
       transform: rotateY(180deg);
     }
 
-    /* Much slower blur and fade transition for the first 3 items */
+    /* Much slower blur and fade transition for items */
     .value {
       filter: blur(0);
       opacity: 1;
       letter-spacing: 0;
-      transition: filter 20s ease, opacity 20s ease, letter-spacing 20s ease;
+      transition: filter 15s ease, opacity 15s ease, letter-spacing 15s ease;
     }
 
     .card.flipped .value {
@@ -61,7 +84,7 @@
       letter-spacing: 0.55em;
     }
 
-    /* Memory blur effect triggered upon scrolling past, with a slow transition */
+    /* Uniform lighter memory blur effect triggered upon scrolling past */
     .card.memory-blur .front,
     .card.memory-blur .back {
       filter: blur(2px);
@@ -78,37 +101,48 @@
       min-height: 1.5em;
     }
 
-    /* The 4th item (last-to-go) retains a delayed, staggered transition */
     .value.last-to-go {
       transition: filter 5s linear 15s, opacity 5s linear 15s, letter-spacing 5s linear 15s;
     }
   </style>
 </head>
-<body class="bg-slate-100 min-h-screen flex items-center p-8">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center p-8 relative">
 
-  <!-- Horizontally scrollable container for 20 cards -->
-  <div id="cards" class="w-full flex flex-row flex-nowrap items-stretch justify-start gap-6 overflow-x-auto pb-6 px-4"></div>
+  <!-- Top-left website title -->
+  <div class="absolute top-6 left-8 font-mono text-base sm:text-lg font-bold text-slate-200 tracking-[0.2em] uppercase">The Experience</div>
+
+  <div class="w-full flex flex-col">
+    <div id="cards" class="w-full flex flex-row flex-nowrap items-stretch justify-start gap-6 overflow-x-auto pb-6 px-4"></div>
+    <!-- Scrollbar edge date labels -->
+    <div class="w-full flex justify-between items-center px-4 font-mono text-xs font-semibold text-slate-400 tracking-[0.2em] uppercase">
+      <span id="scroll-start-date"></span>
+      <span id="scroll-end-date"></span>
+    </div>
+  </div>
 
   <template id="card-template">
     <div class="w-[360px] min-w-[360px] shrink-0 flex flex-col items-center">
-      <!-- Date label on top of each card -->
-      <div class="card-date font-mono text-xs font-semibold text-stone-500 mb-3 tracking-[0.2em] uppercase"></div>
+      <!-- Date and Certainty header on top of each card -->
+      <div class="w-full flex justify-between items-center mb-3 px-1">
+        <div class="card-date font-mono text-xs font-semibold text-slate-400 tracking-[0.2em] uppercase"></div>
+        <div class="card-certainty font-mono text-xs font-semibold text-slate-400 tracking-[0.2em] uppercase"></div>
+      </div>
       
       <div class="card w-full h-[520px] transition-all duration-700">
         <div class="inner">
 
           <!-- Front face -->
-          <div class="front bg-white rounded-3xl shadow-xl shadow-slate-200/60 p-6 flex flex-col justify-between border border-slate-200/80 transition-all duration-700">
+          <div class="front bg-slate-900 rounded-3xl shadow-2xl shadow-black/60 p-6 flex flex-col justify-between border border-slate-800 transition-all duration-700">
             <div class="flex flex-col h-full justify-between">
               <div class="flex flex-col items-center">
-                <div class="front-media w-full h-60 rounded-2xl overflow-hidden bg-slate-100"></div>
+                <div class="front-media w-full h-60 rounded-2xl overflow-hidden bg-slate-950/80"></div>
 
-                <h2 class="front-title text-xl font-bold text-slate-800 mt-6 tracking-tight text-center truncate w-full"></h2>
-                <p class="front-place text-sm font-normal text-slate-500 mt-1 text-center truncate w-full"></p>
+                <h2 class="front-title text-sm sm:text-base font-bold text-slate-100 mt-5 tracking-tight text-center line-clamp-2 w-full px-1"></h2>
+                <p class="front-place text-xs font-normal text-slate-400 mt-1 text-center truncate w-full"></p>
               </div>
 
               <div class="w-full mt-4">
-                <button type="button" class="archive-btn w-full py-3.5 px-4 bg-slate-900 hover:bg-slate-800 text-white font-medium text-sm rounded-xl transition-all duration-200 shadow-md hover:shadow-lg active:scale-[0.99] flex items-center justify-center gap-2">
+                <button type="button" class="archive-btn w-full py-3.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-sm rounded-xl transition-all duration-200 border border-slate-700 shadow-md hover:shadow-lg active:scale-[0.99] flex items-center justify-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v1a2 2 0 01-2 2M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                   </svg>
@@ -118,35 +152,35 @@
             </div>
           </div>
 
-          <!-- Back face: archival specimen label -->
-          <div class="back bg-[#f7f4ee] rounded-3xl shadow-xl shadow-slate-200/60 p-6 transition-all duration-700">
-            <div class="survives h-full box-border border border-stone-400/80 px-5 py-6 flex flex-col font-mono text-stone-800">
-              <p class="survives text-[11px] tracking-[0.28em] uppercase text-stone-500">Catalog</p>
-              <p class="survives catalog-id text-lg tracking-[0.18em] mt-1">REC-000</p>
+          <!-- Back face: archival specimen label in dark mode -->
+          <div class="back bg-[#171615] rounded-3xl shadow-2xl shadow-black/60 p-6 transition-all duration-700 border border-stone-800">
+            <div class="survives h-full box-border border border-stone-700/80 px-5 py-6 flex flex-col font-mono text-stone-200">
+              <p class="survives text-[11px] tracking-[0.28em] uppercase text-stone-400">Catalog</p>
+              <p class="survives catalog-id text-lg tracking-[0.18em] mt-1 text-stone-100">REC-000</p>
 
               <div class="mt-6 space-y-5 text-[13px] leading-relaxed">
                 <div>
-                  <p class="survives text-[10px] tracking-[0.22em] uppercase text-stone-500">Title</p>
+                  <p class="survives text-[10px] tracking-[0.22em] uppercase text-stone-400">Title</p>
                   <div class="value-slot mt-1">
-                    <p class="value field-title">Specimen title (placeholder)</p>
+                    <p class="value field-title text-stone-200">Specimen title (placeholder)</p>
                   </div>
                 </div>
                 <div>
-                  <p class="survives text-[10px] tracking-[0.22em] uppercase text-stone-500">Date and place</p>
+                  <p class="survives text-[10px] tracking-[0.22em] uppercase text-stone-400">Date and place</p>
                   <div class="value-slot mt-1">
-                    <p class="value field-date-place">0000-00-00 · place unknown</p>
+                    <p class="value field-date-place text-stone-200">0000-00-00 · place unknown</p>
                   </div>
                 </div>
                 <div>
-                  <p class="survives text-[10px] tracking-[0.22em] uppercase text-stone-500">Recorded by</p>
+                  <p class="survives text-[10px] tracking-[0.22em] uppercase text-stone-400">Recorded by</p>
                   <div class="value-slot mt-1">
-                    <p class="value field-recorder">Recorder name</p>
+                    <p class="value field-recorder text-stone-200">Recorder name</p>
                   </div>
                 </div>
                 <div>
-                  <p class="survives text-[10px] tracking-[0.22em] uppercase text-stone-500">What was not captured</p>
+                  <p class="survives text-[10px] tracking-[0.22em] uppercase text-stone-400">What was not captured</p>
                   <div class="value-slot mt-1">
-                    <p class="value last-to-go field-not-captured">A note of what this record fails to hold.</p>
+                    <p class="value last-to-go field-not-captured text-stone-300">A note of what this record fails to hold.</p>
                   </div>
                 </div>
               </div>
@@ -159,106 +193,184 @@
   </template>
 
   <script>
+    function getField(val) {
+      if (val === undefined || val === null || (typeof val === 'string' && val.trim() === '')) {
+        return 'Data not found';
+      }
+      return val;
+    }
+
     function renderMedia(container, record) {
       container.replaceChildren();
 
-      if (record.type === 'image') {
+      const type = record ? record.type : null;
+      const file = record ? record.file : null;
+      const title = record ? record.title : null;
+
+      if (!type || !file || type.trim() === '' || file.trim() === '') {
+        const p = document.createElement('p');
+        p.className = 'text-sm text-stone-400 font-mono text-center p-4';
+        p.textContent = 'Data not found';
+        container.appendChild(p);
+        return;
+      }
+
+      if (type === 'image') {
         const img = document.createElement('img');
-        img.src = record.file;
-        img.alt = record.title;
+        img.src = file;
+        img.alt = getField(title);
         img.className = 'w-full h-full object-cover';
+        img.onerror = function() {
+          container.replaceChildren();
+          container.classList.add('flex', 'items-center', 'justify-center', 'p-4', 'bg-slate-900');
+          const p = document.createElement('p');
+          p.className = 'text-sm text-stone-400 font-mono text-center';
+          p.textContent = 'Data not found';
+          container.appendChild(p);
+        };
         container.appendChild(img);
         return;
       }
 
-      if (record.type === 'sound') {
+      if (type === 'sound') {
         container.classList.add('flex', 'items-center', 'justify-center', 'p-4');
         const audio = document.createElement('audio');
         audio.controls = true;
-        audio.src = record.file;
+        audio.src = file;
         audio.className = 'w-full';
+        audio.onerror = function() {
+          container.replaceChildren();
+          const p = document.createElement('p');
+          p.className = 'text-sm text-stone-400 font-mono text-center';
+          p.textContent = 'Data not found';
+          container.appendChild(p);
+        };
         container.appendChild(audio);
         return;
       }
 
-      if (record.type === 'text') {
-        container.classList.add('p-4', 'overflow-y-auto');
+      if (type === 'text') {
+        container.classList.add('p-4', 'overflow-y-auto', 'flex', 'flex-col', 'items-start', 'justify-start', 'bg-slate-900');
         const pre = document.createElement('p');
-        pre.className = 'text-sm text-slate-600 whitespace-pre-wrap leading-relaxed';
-        pre.textContent = record.title;
+        pre.className = 'text-xs text-slate-300 whitespace-pre-wrap leading-relaxed font-mono w-full';
+        pre.textContent = 'Loading text...';
         container.appendChild(pre);
+
+        fetch(file)
+          .then(function(response) {
+            if (!response.ok) throw new Error('Could not load text file');
+            return response.text();
+          })
+          .then(function(text) {
+            pre.textContent = text;
+          })
+          .catch(function(err) {
+            console.error(err);
+            container.replaceChildren();
+            const p = document.createElement('p');
+            p.className = 'text-sm text-stone-400 font-mono text-center w-full my-auto';
+            p.textContent = 'Data not found';
+            container.appendChild(p);
+          });
+        return;
       }
+
+      // Default fallback display
+      container.classList.add('p-4', 'overflow-y-auto', 'flex', 'items-center', 'justify-center', 'bg-slate-900');
+      const pre = document.createElement('p');
+      pre.className = 'text-sm text-slate-300 text-center whitespace-pre-wrap leading-relaxed font-medium';
+      pre.textContent = getField(title);
+      container.appendChild(pre);
     }
 
     function fillCard(cardEl, record) {
-      cardEl.querySelector('.card-date').textContent = record.date;
-      cardEl.querySelector('.catalog-id').textContent = record.id;
-      cardEl.querySelector('.field-title').textContent = record.title;
-      cardEl.querySelector('.field-date-place').textContent = record.date + ' · ' + record.place;
-      cardEl.querySelector('.field-recorder').textContent = record.recorder;
-      cardEl.querySelector('.field-not-captured').textContent = record.not_captured;
-      cardEl.querySelector('.front-title').textContent = record.title;
-      cardEl.querySelector('.front-place').textContent = record.place;
-      renderMedia(cardEl.querySelector('.front-media'), record);
+      const safeRecord = record || {};
+
+      cardEl.querySelector('.card-date').textContent = getField(safeRecord.date);
+      cardEl.querySelector('.card-certainty').textContent = 'Certainty: ' + getField(safeRecord.certainty);
+      cardEl.querySelector('.catalog-id').textContent = getField(safeRecord.id);
+      cardEl.querySelector('.field-title').textContent = getField(safeRecord.title);
+      
+      const dateVal = getField(safeRecord.date);
+      const placeVal = getField(safeRecord.place);
+      if (dateVal === 'Data not found' && placeVal === 'Data not found') {
+        cardEl.querySelector('.field-date-place').textContent = 'Data not found';
+      } else if (dateVal === 'Data not found') {
+        cardEl.querySelector('.field-date-place').textContent = 'Data not found · ' + placeVal;
+      } else if (placeVal === 'Data not found') {
+        cardEl.querySelector('.field-date-place').textContent = dateVal + ' · Data not found';
+      } else {
+        cardEl.querySelector('.field-date-place').textContent = dateVal + ' · ' + placeVal;
+      }
+
+      cardEl.querySelector('.field-recorder').textContent = getField(safeRecord.recorder);
+      cardEl.querySelector('.field-not-captured').textContent = getField(safeRecord.not_captured);
+      cardEl.querySelector('.front-title').textContent = getField(safeRecord.title);
+      cardEl.querySelector('.front-place').textContent = getField(safeRecord.place);
+      renderMedia(cardEl.querySelector('.front-media'), safeRecord);
 
       const archiveBtn = cardEl.querySelector('.archive-btn');
       archiveBtn.addEventListener('click', function () {
         const cardNode = cardEl.querySelector('.card');
-        cardNode.classList.add('flipped');
+        cardNode.classList.toggle('flipped');
       });
     }
 
-    fetch('records.json')
-      .then(function (response) {
-        if (!response.ok) throw new Error('Could not load records.json');
-        return response.json();
-      })
-      .then(function (data) {
-        let records = data.records || [];
-        
-        // Ensure we always have 20 records
-        for (let i = records.length + 1; i <= 20; i++) {
-          const idStr = 'REC-' + String(i).padStart(3, '0');
-          records.push({
-            id: idStr,
-            title: 'Specimen Title ' + i,
-            type: 'text',
-            file: 'media/description.txt',
-            date: '2026-08-' + (10 + (i % 20)),
-            place: 'Placeholder Location ' + i,
-            recorder: 'Echo',
-            not_captured: 'unrecorded sensory detail ' + i,
-            certainty: 3
+    window.addEventListener('DOMContentLoaded', function () {
+      fetch('records.json')
+        .then(function (response) {
+          if (!response.ok) throw new Error('Could not load records.json');
+          return response.json();
+        })
+        .then(function (data) {
+          const records = (data && Array.isArray(data.records)) ? data.records : [];
+          const template = document.getElementById('card-template');
+          const cardsRoot = document.getElementById('cards');
+
+          cardsRoot.replaceChildren();
+
+          if (records.length === 0) {
+            const emptyMsg = document.createElement('div');
+            emptyMsg.className = 'text-stone-400 font-mono text-sm p-4';
+            emptyMsg.textContent = 'Data not found';
+            cardsRoot.appendChild(emptyMsg);
+            return;
+          }
+
+          // Populate start and end dates under the scrollbar edges
+          document.getElementById('scroll-start-date').textContent = getField(records[0].date);
+          document.getElementById('scroll-end-date').textContent = getField(records[records.length - 1].date);
+
+          records.forEach(function (record) {
+            const cardEl = template.content.firstElementChild.cloneNode(true);
+            fillCard(cardEl, record);
+            cardsRoot.appendChild(cardEl);
           });
-        }
 
-        const template = document.getElementById('card-template');
-        const cardsRoot = document.getElementById('cards');
+          // Uniform memory blur behavior when scrolling past cards
+          cardsRoot.addEventListener('scroll', function () {
+            const scrollLeft = cardsRoot.scrollLeft;
+            const cardWrappers = cardsRoot.querySelectorAll(':scope > div');
 
-        records.slice(0, 20).forEach(function (record) {
-          const cardEl = template.content.firstElementChild.cloneNode(true);
-          fillCard(cardEl, record);
-          cardsRoot.appendChild(cardEl);
-        });
-
-        // Scroll blur / memory decay behavior: blur only cards scrolled past, keeping blur permanently
-        cardsRoot.addEventListener('scroll', function () {
-          const scrollLeft = cardsRoot.scrollLeft;
-          const cardWrappers = cardsRoot.querySelectorAll(':scope > div');
-
-          cardWrappers.forEach(function (wrapper) {
-            const card = wrapper.querySelector('.card');
-            const cardRight = wrapper.offsetLeft + wrapper.offsetWidth;
-            // Check if card has scrolled past the left viewport boundary
-            if (cardRight < scrollLeft + 50) {
-              card.classList.add('memory-blur');
-            }
+            cardWrappers.forEach(function (wrapper) {
+              const card = wrapper.querySelector('.card');
+              const cardRight = wrapper.offsetLeft + wrapper.offsetWidth;
+              if (cardRight < scrollLeft + 50) {
+                card.classList.add('memory-blur');
+              }
+            });
           });
+        })
+        .catch(function (err) {
+          console.error(err);
+          const cardsRoot = document.getElementById('cards');
+          cardsRoot.replaceChildren();
+          const errorMsg = document.createElement('div');
+          errorMsg.className = 'text-stone-400 font-mono text-sm p-4';
+          errorMsg.textContent = 'Data not found';
+          cardsRoot.appendChild(errorMsg);
         });
-      })
-      .catch(function (err) {
-        console.error(err);
-      });
+    });
   </script>
 
 </body>
