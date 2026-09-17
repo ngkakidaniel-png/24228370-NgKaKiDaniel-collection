@@ -1,0 +1,183 @@
+{
+  "made_with": "ARTT3005 board",
+  "board_heading": null,
+  "recorder_is": "person",
+  "key_mapping": {
+    "id": "id",
+    "title": "title",
+    "type": "",
+    "file": "file",
+    "date": "date",
+    "place": "place",
+    "recorder": "recorder",
+    "not_captured": "not_captured",
+    "certainty": "certainty"
+  },
+  "extra_fields": [
+    "type"
+  ],
+  "shown_on_card": "type",
+  "groups": [
+    {
+      "heading": "Rating Scores - The Sense of Achievement",
+      "members": [
+        "REC-005",
+        "REC-010",
+        "REC-015",
+        "REC-013",
+        "REC-007"
+      ]
+    },
+    {
+      "heading": "The Beginning - The Excitement",
+      "members": [
+        "REC-001",
+        "REC-002",
+        "REC-003",
+        "REC-004"
+      ]
+    },
+    {
+      "heading": "The Chase of Improvement - The frustrations and Determination & The beginning of loss",
+      "members": [
+        "REC-006",
+        "REC-008",
+        "REC-009",
+        "REC-011"
+      ]
+    },
+    {
+      "heading": "The Improvement - The Proudness of getting good & The loss of the original excitement",
+      "members": [
+        "REC-014",
+        "REC-012",
+        "REC-019",
+        "REC-018",
+        "REC-017",
+        "REC-016"
+      ]
+    }
+  ],
+  "positions": {
+    "REC-001": {
+      "x": 0.0055,
+      "y": 0.3135,
+      "world_x": -2056,
+      "world_y": -91
+    },
+    "REC-002": {
+      "x": 0.2085,
+      "y": 0.3259,
+      "world_x": -1871,
+      "world_y": -81
+    },
+    "REC-003": {
+      "x": 0.4114,
+      "y": 0.3135,
+      "world_x": -1686,
+      "world_y": -91
+    },
+    "REC-004": {
+      "x": 0.6144,
+      "y": 0.3135,
+      "world_x": -1501,
+      "world_y": -91
+    },
+    "REC-005": {
+      "x": 0.0091,
+      "y": 0.011,
+      "world_x": -2053,
+      "world_y": -351
+    },
+    "REC-006": {
+      "x": 0.002,
+      "y": 0.638,
+      "world_x": -2060,
+      "world_y": 187
+    },
+    "REC-007": {
+      "x": 1,
+      "y": 0.0051,
+      "world_x": -1150,
+      "world_y": -356
+    },
+    "REC-008": {
+      "x": 0.2006,
+      "y": 0.6339,
+      "world_x": -1878,
+      "world_y": 184
+    },
+    "REC-009": {
+      "x": 0.3856,
+      "y": 0.6307,
+      "world_x": -1710,
+      "world_y": 181
+    },
+    "REC-010": {
+      "x": 0.2072,
+      "y": 0.0125,
+      "world_x": -1873,
+      "world_y": -350
+    },
+    "REC-011": {
+      "x": 0.5767,
+      "y": 0.6339,
+      "world_x": -1536,
+      "world_y": 184
+    },
+    "REC-012": {
+      "x": 0,
+      "y": 1,
+      "world_x": -2061,
+      "world_y": 498
+    },
+    "REC-013": {
+      "x": 0.391,
+      "y": 0.0125,
+      "world_x": -1705,
+      "world_y": -350
+    },
+    "REC-014": {
+      "x": 0.1865,
+      "y": 1,
+      "world_x": -1891,
+      "world_y": 498
+    },
+    "REC-015": {
+      "x": 0.5725,
+      "y": 0.0092,
+      "world_x": -1540,
+      "world_y": -353
+    },
+    "REC-016": {
+      "x": 0.3765,
+      "y": 0.9964,
+      "world_x": -1718,
+      "world_y": 495
+    },
+    "REC-017": {
+      "x": 0.5646,
+      "y": 0.9964,
+      "world_x": -1547,
+      "world_y": 495
+    },
+    "REC-018": {
+      "x": 0.7444,
+      "y": 0.9942,
+      "world_x": -1383,
+      "world_y": 493
+    },
+    "REC-019": {
+      "x": 0.9347,
+      "y": 0.9942,
+      "world_x": -1209,
+      "world_y": 493
+    },
+    "REC-020": {
+      "x": 0.7722,
+      "y": 0,
+      "world_x": -1357,
+      "world_y": -361
+    }
+  }
+}

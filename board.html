@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>The Board · ARTT3005</title>
+<style>
+:root{--bg:#E9EDE9;--bg2:#DDE4DF;--ink:#14191A;--mut:#66736F;--grn:#2E6B55;--rust:#A8452C;--line:#C3CDC7}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Helvetica Neue",sans-serif;background:var(--bg);color:var(--ink);overflow:hidden}
+#setup{position:fixed;inset:0;background:var(--bg);overflow:auto;padding:38px 46px;z-index:50}
+#setup h1{font-family:Georgia,serif;font-weight:400;font-size:30px;margin:0 0 6px}
+#setup p.sub{color:var(--mut);margin:0 0 26px;font-size:15px}
+.panel{background:#fff;border:1px solid var(--line);padding:20px 22px;margin-bottom:18px;max-width:1080px}
+.panel h2{font-family:Georgia,serif;font-weight:400;font-size:20px;margin:0 0 4px}
+.panel .hint{color:var(--mut);font-size:13px;margin:0 0 14px;line-height:1.55}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{text-align:left;font:600 11px ui-monospace,"Courier New",monospace;letter-spacing:.12em;color:var(--grn);padding:0 10px 7px 0;border-bottom:1px solid var(--grn)}
+td{padding:8px 10px 8px 0;border-bottom:1px solid var(--line);vertical-align:middle}
+code{font:13px ui-monospace,"Courier New",monospace;background:var(--bg2);padding:2px 6px}
+select{font:14px inherit;padding:5px 7px;border:1px solid var(--line);background:#fff;min-width:180px}
+.cov{font:12px ui-monospace,monospace;color:var(--mut)}
+.cov.part{color:var(--rust);font-weight:700}
+.btn{font:14px inherit;padding:10px 20px;border:1px solid var(--grn);background:var(--grn);color:#fff;cursor:pointer}
+.btn.ghost{background:none;color:var(--grn)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+label.radio{display:inline-flex;align-items:center;gap:7px;margin-right:22px;font-size:14px;cursor:pointer}
+#drop{border:1px dashed var(--mut);background:var(--bg2);padding:34px;text-align:center;color:var(--mut);cursor:pointer}
+#drop.over{border-color:var(--grn);color:var(--grn)}
+
+#stage{position:fixed;inset:0;overflow:hidden;cursor:grab;touch-action:none}
+#stage.panning{cursor:grabbing}
+#world{position:absolute;left:0;top:0;transform-origin:0 0}
+.card{position:absolute;left:0;top:0;will-change:transform;width:150px;background:#fff;border:1px solid var(--line);padding:7px;cursor:grab;user-select:none;box-shadow:0 1px 3px rgba(0,0,0,.13)}
+.card.sel{border-color:var(--grn);box-shadow:0 0 0 2px var(--grn)}
+.card.drag{cursor:grabbing;z-index:900;box-shadow:0 8px 22px rgba(0,0,0,.28)}
+.card .thumb{width:100%;height:96px;object-fit:cover;display:block;background:var(--bg2)}
+#world{will-change:transform}
+.card .glyph{width:100%;height:96px;display:grid;place-items:center;background:var(--bg2);font-size:32px;color:var(--mut)}
+.card .kid{font:10px ui-monospace,monospace;color:var(--grn);margin-top:5px}
+.card .ttl{font-size:11px;line-height:1.35;margin-top:2px;max-height:30px;overflow:hidden}
+.card .xtra{font:10px ui-monospace,monospace;color:var(--rust);margin-top:5px;padding-top:4px;border-top:1px solid var(--line);max-height:26px;overflow:hidden}
+.card .all{display:none;font:9px ui-monospace,"Courier New",monospace;line-height:1.5;margin-top:5px;padding-top:5px;border-top:1px solid var(--line)}
+#world.showall .card .all{display:block}
+#world.showall .card .xtra{display:none}
+.card .all .k{color:var(--grn)}
+.card .all .miss{color:var(--mut);font-style:italic}
+.card .all .nc{color:var(--rust)}
+.group{position:absolute;left:0;top:0;will-change:transform;border:1px solid var(--grn);background:rgba(46,107,85,.05);pointer-events:none}
+.group .gh{position:absolute;top:-30px;left:0;font-family:Georgia,serif;font-size:17px;color:var(--grn);white-space:nowrap;pointer-events:auto;cursor:text;background:var(--bg);padding:1px 7px}
+#marquee{position:absolute;border:1px solid var(--grn);background:rgba(46,107,85,.1);display:none;pointer-events:none}
+
+#insp{position:fixed;top:0;right:0;width:330px;height:calc(100% - 46px);background:#fff;border-left:1px solid var(--line);padding:22px;overflow:auto;z-index:45;display:none;box-shadow:-3px 0 14px rgba(0,0,0,.09)}
+#insp h3{font-family:Georgia,serif;font-weight:400;font-size:19px;margin:0 0 3px}
+#insp .cid{font:11px ui-monospace,monospace;color:var(--grn);margin-bottom:16px}
+#insp img,#insp audio{width:100%;margin-bottom:16px}
+#insp dt{font:600 10px ui-monospace,monospace;letter-spacing:.1em;color:var(--mut);margin-top:13px}
+#insp dd{margin:3px 0 0;line-height:1.5;word-break:break-word;font-size:13px}
+#insp .nc dt,#insp .nc dd{color:var(--rust)}
+#insp .absent dd{color:var(--mut);font-style:italic}
+#insp .x{position:absolute;top:14px;right:16px;cursor:pointer;color:var(--mut);font-size:20px}
+
+#bar{position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:var(--bg);padding:10px 16px;display:flex;gap:12px;align-items:center;font-size:13px;z-index:40;flex-wrap:wrap}
+#bar input{background:#1D2422;border:1px solid var(--grn);color:var(--bg);padding:7px 9px;font:13px inherit;width:330px}
+#bar button{background:var(--grn);border:0;color:#fff;padding:8px 14px;cursor:pointer;font:13px inherit}
+#bar button.sec{background:none;border:1px solid var(--mut);color:var(--bg)}
+#bar .sp{flex:1}
+#msg{color:#9FB3AA;font:12px ui-monospace,monospace}
+#help{position:fixed;top:14px;right:16px;background:rgba(20,25,26,.88);color:var(--bg);padding:11px 14px;font:12px ui-monospace,monospace;line-height:1.7;z-index:41}
+</style></head>
+<body>
+
+<div id="setup">
+  <h1>The Board</h1>
+  <p class="sub">ARTT3005 &middot; Class 3 &middot; Block 1 &nbsp;&mdash;&nbsp; arrange your own collection, and say what belongs with what.</p>
+
+  <div class="panel">
+    <h2>1 &middot; Load your records</h2>
+    <p class="hint">Put this file in the same folder as your <code>records.json</code> and <code>media/</code>, serve the folder, and open it. If it does not load by itself, drop the file here.</p>
+    <div id="drop">drop records.json here</div>
+  </div>
+
+  <div class="panel" id="mapPanel" style="display:none">
+    <h2>2 &middot; Make the keys match</h2>
+    <p class="hint">Only three of these are compulsory &mdash; <code>id</code>, <code>title</code> and <code>file</code> &mdash; because the board cannot draw a card without them. Everything else is optional today.<br><br>Any key you invented is <strong>kept under its own name</strong>. It is not thrown away.</p>
+    <table id="mapTable"><thead><tr>
+      <th style="width:26%">YOUR KEY</th><th style="width:16%">PRESENT IN</th>
+      <th style="width:30%">THE BOARD READS IT AS</th><th>EXAMPLE VALUE</th>
+    </tr></thead><tbody></tbody></table>
+  </div>
+
+  <div class="panel" id="recPanel" style="display:none">
+    <h2>3 &middot; One question a script cannot answer</h2>
+    <p class="hint">Two students can both have a <code>recorder</code> field. One wrote <code>"Clare"</code>. The other wrote <code>"iPhone 13 Pro"</code>. Same key, different kind of thing &mdash; and no software can tell which is which.</p>
+    <div id="recEg" class="cov" style="margin-bottom:12px"></div>
+    <label class="radio"><input type="radio" name="rec" value="person" checked> a person</label>
+    <label class="radio"><input type="radio" name="rec" value="device"> a device</label>
+    <label class="radio"><input type="radio" name="rec" value="both"> both, mixed</label>
+  </div>
+
+  <div class="panel" id="extraPanel" style="display:none">
+    <h2>4 &middot; Your own fields</h2>
+    <p class="hint">These keys belong only to your collection. Pick one to print on the front of every card, so you can arrange by it.</p>
+    <div id="extraList" class="cov" style="margin-bottom:14px"></div>
+    <select id="extraPick"><option value="">nothing extra on the card</option></select>
+  </div>
+
+  <div class="panel" id="goPanel" style="display:none">
+    <button class="btn" id="go">Open the board</button>
+    <button class="btn ghost" id="dlMap">Save mapping.json</button>
+  </div>
+</div>
+
+<div id="stage"><div id="world"></div><div id="marquee"></div></div>
+
+<div id="insp"><span class="x" id="inspX">&times;</span><div id="inspBody"></div></div>
+
+<div id="help" style="display:none">
+  drag empty space &nbsp;&middot;&nbsp; pan<br>
+  scroll / pinch &nbsp;&middot;&nbsp; zoom<br>
+  shift + drag &nbsp;&middot;&nbsp; select several<br>
+  drag a card &nbsp;&middot;&nbsp; move it<br>
+  click a card &nbsp;&middot;&nbsp; see every field
+</div>
+
+<div id="bar" style="display:none">
+  <input id="bh" placeholder="a heading for the whole board &mdash; optional">
+  <button id="grp" class="sec">Group selection</button>
+  <button id="all" class="sec">All fields</button>
+  <button id="fit" class="sec">Fit</button>
+  <span class="sp"></span><span id="msg"></span>
+  <button id="png" class="sec">Export PNG</button>
+  <button id="doc" class="sec">Export document</button>
+  <button id="save">Save arrangement.json</button>
+</div>
+
+<script>
+const STD=["id","title","date","place","recorder","file","not_captured","certainty"];
+const SYN={
+ id:["id","catalog_id","record_id","uid","key","no","number"],
+ title:["title","name","caption","label","heading"],
+ date:["date","when","taken","created","datetime","timestamp"],
+ place:["place","location","where","site","venue","address"],
+ recorder:["recorder","by","author","photographer","device","camera","captured_by"],
+ file:["file","image","img","media","path","src","audio","filename","url"],
+ not_captured:["not_captured","notcaptured","missing","absent","what_was_not_captured","lost"],
+ certainty:["certainty","confidence","sure","certainty_level"]};
+const IMG=/\.(jpe?g|png|webp|gif|bmp|heic)$/i, SND=/\.(mp3|wav|m4a|ogg|aac|flac)$/i;
+const CW=150, CH=176;
+
+let RAW=null, ROWS=[], MAP={}, RECKIND="person", RECMAP={}, ALLKEYS=[];
+let cards=[], groups=[], sel=new Set(), pan={x:0,y:0}, scale=1;
+const POS=new Map();                       // id -> {x,y}   never touch dataset during a drag
+const put=(el,x,y)=>{ const p=POS.get(el.dataset.id); p.x=x; p.y=y;
+  el.style.transform=`translate3d(${x}px,${y}px,0)`; };
+const at=el=>POS.get(el.dataset.id);
+const $=id=>document.getElementById(id);
+const world=$("world"), stage=$("stage");
+const esc=s=>String(s).replace(/[<>&]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c]));
+const has=v=>v!==undefined&&v!==null&&v!=="";
+const show=v=>esc(typeof v==="object"?JSON.stringify(v):v);
+
+/* ── load ── */
+function findArray(j){
+  if(Array.isArray(j)) return j;
+  for(const k of Object.keys(j)) if(Array.isArray(j[k])&&j[k].length&&typeof j[k][0]==="object") return j[k];
+  return [];
+}
+function ingest(j){
+  RAW=j; ROWS=findArray(j);
+  if(!ROWS.length){ alert("No array of records found in that file."); return; }
+  buildMapUI();
+}
+fetch("records.json").then(r=>r.json()).then(ingest).catch(()=>{});
+const drop=$("drop");
+drop.onclick=()=>{const i=document.createElement("input");i.type="file";i.accept=".json";
+  i.onchange=e=>readFile(e.target.files[0]);i.click();};
+drop.ondragover=e=>{e.preventDefault();drop.classList.add("over")};
+drop.ondragleave=()=>drop.classList.remove("over");
+drop.ondrop=e=>{e.preventDefault();drop.classList.remove("over");readFile(e.dataTransfer.files[0])};
+function readFile(f){ if(!f)return; const r=new FileReader();
+  r.onload=()=>{try{ingest(JSON.parse(r.result))}catch(err){alert("That is not valid JSON.\n\n"+err.message)}};
+  r.readAsText(f); }
+
+/* ── key mapping ── */
+function buildMapUI(){
+  const keys={}; ROWS.forEach(r=>Object.keys(r).forEach(k=>keys[k]=(keys[k]||0)+1));
+  const taken=new Set(), tb=$("mapTable").querySelector("tbody"); tb.innerHTML="";
+  Object.keys(keys).forEach(k=>{
+    const lk=k.toLowerCase(); let guess="";
+    for(const s of STD) if(!taken.has(s)&&SYN[s].includes(lk)){guess=s;taken.add(s);break;}
+    MAP[k]=guess;
+    const eg=(ROWS.find(r=>r[k]!==undefined)||{})[k], egs=show(eg);
+    const n=keys[k], full=n===ROWS.length;
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td><code>${esc(k)}</code></td>
+      <td class="cov ${full?"":"part"}">${n} / ${ROWS.length}${full?" &#10003;":" &#9888;"}</td><td></td>
+      <td class="cov">${egs.slice(0,58)}${egs.length>58?"&hellip;":""}</td>`;
+    const sl=document.createElement("select");
+    sl.innerHTML='<option value="">keep my own name</option>'+STD.map(s=>`<option value="${s}">${s}</option>`).join("");
+    sl.value=guess;
+    sl.onchange=()=>{MAP[k]=sl.value;refreshExtras();checkReady()};
+    tr.children[2].appendChild(sl); tb.appendChild(tr);
+  });
+  refreshExtras();
+  $("mapPanel").style.display=""; $("goPanel").style.display="";
+  const rk=Object.keys(MAP).find(k=>MAP[k]==="recorder");
+  if(rk){ $("recPanel").style.display="";
+    $("recEg").textContent="yours says: "+[...new Set(ROWS.map(r=>r[rk]).filter(Boolean))].slice(0,3).join("  ·  "); }
+  checkReady();
+}
+function refreshExtras(){
+  const ex=Object.keys(MAP).filter(k=>!MAP[k]);
+  $("extraList").textContent=ex.length?ex.join("   ·   "):"none";
+  const p=$("extraPick"), cur=p.value;
+  p.innerHTML='<option value="">nothing extra on the card</option>'+ex.map(k=>`<option value="${esc(k)}">${esc(k)}</option>`).join("");
+  if(ex.includes(cur)) p.value=cur;
+  $("extraPanel").style.display=ex.length?"":"none";
+}
+function checkReady(){
+  const vals=Object.values(MAP).filter(Boolean);
+  const dup=[...new Set(vals.filter((v,i)=>vals.indexOf(v)!==i))];
+  const need=["id","title"].filter(s=>!vals.includes(s));
+  const b=$("go");
+  if(dup.length){ b.disabled=true; b.textContent="two keys both set to: "+dup.join(", "); return; }
+  b.disabled=need.length>0;
+  b.textContent=need.length?("still need: "+need.join(", ")):"Open the board";
+}
+function norm(){
+  const inv={}; Object.entries(MAP).forEach(([k,v])=>{if(v)inv[v]=k});
+  return ROWS.map((r,i)=>{
+    const o={};
+    STD.forEach(s=>{ if(inv[s]!==undefined&&r[inv[s]]!==undefined) o[s]=r[inv[s]]; });
+    if(o.id===undefined) o.id="REC-"+String(i+1).padStart(3,"0");
+    Object.keys(r).forEach(k=>{ if(!MAP[k]) o[k]=r[k]; });
+    return o;
+  });
+}
+
+/* ── build the board ── */
+function allBlock(r){
+  return ALLKEYS.filter(k=>k!=="id").map(k=>
+    `<div class="${k==="not_captured"?"nc":""}"><span class="k">${esc(k)}</span> `+
+    (has(r[k])?`<span>${show(r[k]).slice(0,60)}</span>`:`<span class="miss">&mdash; not in this record</span>`)+
+    `</div>`).join("");
+}
+$("go").onclick=()=>{
+  const recs=norm(), xk=$("extraPick").value;
+  recs.forEach(r=>RECMAP[r.id]=r);
+  ALLKEYS=[...new Set(recs.flatMap(r=>Object.keys(r)))];
+  $("setup").style.display="none"; $("bar").style.display="flex"; $("help").style.display="";
+  $("msg").textContent="preparing images\u2026";
+  recs.forEach((r,i)=>{
+    const el=document.createElement("div");
+    el.className="card"; el.dataset.id=r.id;
+    const f=String(r.file||"");
+    el.innerHTML=(IMG.test(f)?`<img class="thumb" src="${f}" alt="" onerror="this.outerHTML='<div class=glyph>&#10005;</div>'">`
+                            :`<div class="glyph">${SND.test(f)?"&#9834;":"&#182;"}</div>`)
+      +`<div class="kid">${esc(r.id)}</div><div class="ttl">${esc(r.title||"")}</div>`
+      +(xk&&has(r[xk])?`<div class="xtra">${esc(xk)}: ${show(r[xk]).slice(0,44)}</div>`:"")
+      +`<div class="all">${allBlock(r)}</div>`;
+    const wx=90+(i%7)*185, wy=70+Math.floor(i/7)*195;
+    POS.set(r.id,{x:wx,y:wy});
+    el.style.transform=`translate3d(${wx}px,${wy}px,0)`;
+    world.appendChild(el); cards.push(el);
+  });
+  applyT(); fit();
+  makeThumbs(recs);
+};
+
+/* Phone photographs are 3000-4000px wide and are being shown at 136px.
+   The browser decodes every one of them at full size and keeps it in memory,
+   which is what makes a scaled, transformed board stutter.
+   Decode each one ONCE into a small bitmap, then use that everywhere. */
+const THUMB=new Map();
+async function makeThumbs(recs){
+  const jobs=recs.filter(r=>IMG.test(String(r.file||"")));
+  if(!jobs.length) return;
+  let done=0;
+  for(const r of jobs){
+    const im=await loadImg(r.file);
+    if(im){
+      try{
+        const TW=440, TH=310;
+        const cv=document.createElement("canvas"); cv.width=TW; cv.height=TH;
+        const x=cv.getContext("2d");
+        const box=TW/TH; let sw=im.width, sh=im.height, sx=0, sy=0;
+        if(im.width/im.height>box){ sw=im.height*box; sx=(im.width-sw)/2; }
+        else { sh=im.width/box; sy=(im.height-sh)/2; }
+        x.drawImage(im,sx,sy,sw,sh,0,0,TW,TH);
+        const url=cv.toDataURL("image/jpeg",0.86);
+        THUMB.set(r.id,url);
+        const el=cards.find(c=>c.dataset.id===r.id);
+        const tag=el&&el.querySelector("img.thumb");
+        if(tag) tag.src=url;
+      }catch(err){ /* not served: keep the original, just slower */ }
+    }
+    done++;
+    $("msg").textContent=done<jobs.length?`preparing images ${done} / ${jobs.length}`:"";
+  }
+}
+
+/* ── canvas ── */
+function applyT(){ world.style.transform=`translate(${pan.x}px,${pan.y}px) scale(${scale})`; }
+const s2w=(sx,sy)=>({x:(sx-pan.x)/scale, y:(sy-pan.y)/scale});
+function fit(){
+  if(!cards.length) return;
+  const xs=cards.map(c=>at(c).x), ys=cards.map(c=>at(c).y);
+  const a=Math.min(...xs)-60, b=Math.max(...xs)+CW+60, c=Math.min(...ys)-60, d=Math.max(...ys)+CH+60;
+  scale=Math.min(innerWidth/(b-a), (innerHeight-80)/(d-c), 1.4);
+  pan.x=-a*scale+(innerWidth-(b-a)*scale)/2; pan.y=-c*scale+20;
+  applyT(); drawGroups();
+}
+$("fit").onclick=fit;
+
+let mode=null, start=null, dragging=[], downAt=null, liveGroups=[], pending=null, raf=0;
+stage.addEventListener("pointerdown",e=>{
+  const card=e.target.closest(".card");
+  if(card){
+    mode="card"; downAt={x:e.clientX,y:e.clientY,card}; stage.setPointerCapture(e.pointerId);
+    if(!sel.has(card)&&!e.shiftKey){ sel.clear(); }
+    sel.add(card); paint();
+    const w=s2w(e.clientX,e.clientY);
+    dragging=[...sel].map(c=>{ c.classList.add("drag"); const p=at(c);
+      return {c,ox:w.x-p.x,oy:w.y-p.y}; });
+    const moving=new Set(dragging.map(d=>d.c));
+    liveGroups=groups.filter(g=>g.els.some(el=>moving.has(el)));
+  } else if(e.shiftKey){
+    mode="marquee"; stage.setPointerCapture(e.pointerId);
+    start={x:e.clientX,y:e.clientY};
+    Object.assign($("marquee").style,{display:"block",left:e.clientX+"px",top:e.clientY+"px",width:"0px",height:"0px"});
+    sel.clear(); paint();
+  } else {
+    mode="pan"; stage.setPointerCapture(e.pointerId); stage.classList.add("panning");
+    start={x:e.clientX-pan.x,y:e.clientY-pan.y};
+  }
+});
+stage.addEventListener("pointermove",e=>{
+  if(mode==="pan"||mode==="card"){
+    pending={x:e.clientX,y:e.clientY};
+    if(!raf) raf=requestAnimationFrame(frame);
+    return;
+  }
+  if(mode==="marquee"){
+    const x=Math.min(start.x,e.clientX), y=Math.min(start.y,e.clientY);
+    const w=Math.abs(e.clientX-start.x), h=Math.abs(e.clientY-start.y);
+    Object.assign($("marquee").style,{left:x+"px",top:y+"px",width:w+"px",height:h+"px"});
+    sel.clear();
+    cards.forEach(c=>{ const r=c.getBoundingClientRect();
+      if(r.left<x+w&&r.right>x&&r.top<y+h&&r.bottom>y) sel.add(c); });
+    paint();
+  }
+});
+function frame(){
+  raf=0; const e=pending; if(!e||!mode) return;
+  if(mode==="pan"){ pan.x=e.x-start.x; pan.y=e.y-start.y; applyT(); }
+  else if(mode==="card"){
+    const w=s2w(e.x,e.y);
+    for(const d of dragging) put(d.c, w.x-d.ox, w.y-d.oy);
+    if(liveGroups.length) drawGroups(liveGroups);
+  }
+}
+stage.addEventListener("pointerup",e=>{
+  if(mode==="card"){
+    dragging.forEach(d=>d.c.classList.remove("drag"));
+    if(downAt&&Math.hypot(e.clientX-downAt.x,e.clientY-downAt.y)<4) inspect(downAt.card.dataset.id);
+  }
+  if(mode==="marquee") $("marquee").style.display="none";
+  if(raf){cancelAnimationFrame(raf);raf=0;} pending=null;
+  stage.classList.remove("panning"); mode=null; dragging=[]; liveGroups=[]; downAt=null;
+});
+stage.addEventListener("wheel",e=>{
+  e.preventDefault();
+  const b=s2w(e.clientX,e.clientY);
+  scale=Math.min(3,Math.max(.15,scale*(e.deltaY<0?1.12:1/1.12)));
+  pan.x=e.clientX-b.x*scale; pan.y=e.clientY-b.y*scale;
+  applyT();
+},{passive:false});
+function paint(){ cards.forEach(c=>c.classList.toggle("sel",sel.has(c))); }
+
+/* ── groups ── */
+$("grp").onclick=()=>{
+  if(sel.size<2){ $("msg").textContent="select two or more cards first (shift + drag)"; return; }
+  groups.push({heading:"untitled group",members:[...sel].map(c=>c.dataset.id),els:[...sel],el:null});
+  sel.clear(); paint(); drawGroups();
+  $("msg").textContent=groups.length+" group"+(groups.length===1?"":"s")+" \u2014 click a heading to rename it";
+};
+function gBox(g){
+  const m=g.els; if(!m||!m.length) return null;
+  let a=Infinity,b=-Infinity,c=Infinity,d=-Infinity;
+  for(const el of m){ const p=at(el);
+    if(p.x<a)a=p.x; if(p.x>b)b=p.x; if(p.y<c)c=p.y; if(p.y>d)d=p.y; }
+  return {x:a-16, y:c-16, w:b+CW+16-(a-16), h:d+CH+16-(c-16)};
+}
+function drawGroups(only){
+  (only||groups).forEach(g=>{
+    const b=gBox(g); if(!b) return;
+    if(!g.el){
+      g.el=document.createElement("div"); g.el.className="group";
+      const hd=document.createElement("div"); hd.className="gh";
+      hd.contentEditable="true"; hd.textContent=g.heading;
+      hd.oninput=()=>g.heading=hd.textContent;
+      g.el.appendChild(hd); world.insertBefore(g.el,world.firstChild);
+    }
+    g.el.style.transform=`translate3d(${b.x}px,${b.y}px,0)`;
+    g.el.style.width=b.w+"px"; g.el.style.height=b.h+"px";
+  });
+}
+
+/* ── inspector ── */
+function inspect(id){
+  const r=RECMAP[id]; if(!r) return;
+  const f=String(r.file||"");
+  $("inspBody").innerHTML=`<h3>${esc(r.title||"")}</h3><div class="cid">${esc(r.id)}</div>`
+    +(IMG.test(f)?`<img src="${f}" alt="">`:SND.test(f)?`<audio controls src="${f}"></audio>`:"")
+    +"<dl>"+ALLKEYS.filter(k=>k!=="id"&&k!=="title").map(k=>
+      `<div class="${k==="not_captured"?"nc":""} ${has(r[k])?"":"absent"}"><dt>${esc(k)}</dt><dd>${has(r[k])?show(r[k]):"not in this record"}</dd></div>`
+     ).join("")+"</dl>";
+  $("insp").style.display="block";
+}
+$("inspX").onclick=()=>$("insp").style.display="none";
+
+/* ── all fields ── */
+$("all").onclick=()=>{
+  const on=world.classList.toggle("showall");
+  $("all").textContent=on?"Compact":"All fields";
+  $("msg").textContent=on?"every field \u2014 blanks are records that never got that key":"";
+  drawGroups();
+};
+
+/* ── PNG ── */
+function wrap(x,t,maxW,maxLines){
+  const words=String(t).split(/\s+/), lines=[]; let cur="";
+  for(const w of words){ const s=cur?cur+" "+w:w;
+    if(x.measureText(s).width>maxW&&cur){ lines.push(cur); cur=w; if(lines.length===maxLines) break; }
+    else cur=s; }
+  if(lines.length<maxLines&&cur) lines.push(cur);
+  return lines;
+}
+const loadImg=src=>new Promise(res=>{ if(!src) return res(null);
+  const i=new Image(); i.onload=()=>res(i); i.onerror=()=>res(null); i.src=src; });
+
+$("png").onclick=async()=>{
+  if(!cards.length) return;
+  $("msg").textContent="rendering\u2026";
+  const xs=cards.map(c=>at(c).x), ys=cards.map(c=>at(c).y);
+  const minX=Math.min(...xs), minY=Math.min(...ys);
+  const bw=Math.max(...xs)+CW-minX, bh=Math.max(...ys)+CH-minY;
+  const s=Math.min(2600/bw,2000/bh,3), PAD=70, TOP=groups.length?150:120;
+  const W=Math.round(bw*s)+PAD*2, H=Math.round(bh*s)+TOP+PAD;
+  const cv=document.createElement("canvas"); cv.width=W; cv.height=H;
+  const x=cv.getContext("2d");
+  const wx=v=>PAD+(v-minX)*s, wy=v=>TOP+(v-minY)*s;
+  x.fillStyle="#E9EDE9"; x.fillRect(0,0,W,H);
+
+  x.lineWidth=Math.max(1.5,2*s);
+  groups.forEach(g=>{
+    const b=gBox(g); if(!b) return;
+    x.fillStyle="rgba(46,107,85,.055)"; x.fillRect(wx(b.x),wy(b.y),b.w*s,b.h*s);
+    x.strokeStyle="#2E6B55"; x.strokeRect(wx(b.x),wy(b.y),b.w*s,b.h*s);
+    x.fillStyle="#2E6B55"; x.font=`${Math.round(26*s)}px Georgia, serif`; x.textBaseline="bottom";
+    x.fillText(g.heading||"untitled group", wx(b.x)+2, wy(b.y)-8*s);
+  });
+
+  const imgs=await Promise.all(cards.map(c=>{
+    const id=c.dataset.id, f=String((RECMAP[id]||{}).file||"");
+    if(!IMG.test(f)) return Promise.resolve(null);
+    return loadImg(THUMB.get(id)||f);       // cached bitmap when we have one
+  }));
+
+  x.textBaseline="top";
+  cards.forEach((c,i)=>{
+    const r=RECMAP[c.dataset.id]||{}, f=String(r.file||"");
+    const cp=at(c), px=wx(cp.x), py=wy(cp.y), pw=CW*s, ph=CH*s, p=7*s, iw=pw-p*2, ih=96*s;
+    x.fillStyle="#fff"; x.fillRect(px,py,pw,ph);
+    x.strokeStyle="#C3CDC7"; x.lineWidth=Math.max(1,1.2*s); x.strokeRect(px,py,pw,ph);
+    if(imgs[i]){
+      const im=imgs[i], box=iw/ih; let sw=im.width, sh=im.height, sxx=0, syy=0;
+      if(im.width/im.height>box){ sw=im.height*box; sxx=(im.width-sw)/2; }
+      else { sh=im.width/box; syy=(im.height-sh)/2; }
+      x.drawImage(im,sxx,syy,sw,sh,px+p,py+p,iw,ih);
+    } else {
+      x.fillStyle="#DDE4DF"; x.fillRect(px+p,py+p,iw,ih);
+      x.fillStyle="#66736F"; x.font=`${Math.round(34*s)}px serif`; x.textAlign="center";
+      x.fillText(SND.test(f)?"\u266A":"\u00B6", px+pw/2, py+p+ih/2-20*s); x.textAlign="left";
+    }
+    x.fillStyle="#2E6B55"; x.font=`${Math.round(10*s)}px ui-monospace, monospace`;
+    x.fillText(String(r.id||""), px+p, py+p+ih+6*s);
+    x.fillStyle="#14191A"; x.font=`${Math.round(11*s)}px system-ui, sans-serif`;
+    wrap(x,r.title||"",iw,2).forEach((ln,k)=>x.fillText(ln,px+p,py+p+ih+20*s+k*14*s));
+  });
+
+  const hdg=$("bh").value.trim();
+  x.fillStyle="#14191A"; x.font="34px Georgia, serif"; x.textBaseline="top";
+  x.fillText(hdg||"The Board", PAD, 40);
+  x.fillStyle="#66736F"; x.font="19px ui-monospace, monospace";
+  x.fillText(`ARTT3005  \u00b7  ${cards.length} records  \u00b7  ${groups.length} group${groups.length===1?"":"s"}  \u00b7  ${new Date().toISOString().slice(0,10)}`, PAD, 88);
+  if(groups.length){
+    x.fillStyle="#2E6B55"; x.font="italic 21px Georgia, serif";
+    x.fillText(groups.map(g=>g.heading||"untitled").join("   \u00b7   ").slice(0,160), PAD, 116);
+  }
+
+  try{
+    const a=document.createElement("a");
+    a.href=cv.toDataURL("image/png");
+    a.download="board-"+new Date().toISOString().slice(0,10)+".png"; a.click();
+    $("msg").textContent=`exported ${W}\u00d7${H}px`;
+  }catch(err){
+    $("msg").textContent="";
+    alert("The browser blocked the export because the images were not served.\n\nOpen this page through http://localhost:8000 rather than by double-clicking the file, then try again.");
+  }
+};
+
+
+/* ─────────── export a readable document of every record ─────────── */
+function docHTML(){
+  const hdg=$("bh").value.trim()||"The Board";
+  const inGroup=new Set(); groups.forEach(g=>g.members.forEach(id=>inGroup.add(id)));
+  const loose=cards.map(c=>c.dataset.id).filter(id=>!inGroup.has(id));
+
+  const item=id=>{
+    const r=RECMAP[id]||{}, f=String(r.file||"");
+    const th=THUMB.get(id);
+    const kind=IMG.test(f)?"image":SND.test(f)?"sound":f?"text":"\u2014";
+    const rows=ALLKEYS.filter(k=>k!=="id"&&k!=="title").map(k=>
+      `<tr><th>${esc(k)}</th><td class="${has(r[k])?"":"absent"}">${
+        has(r[k])?show(r[k]):"not in this record"}</td></tr>`).join("");
+    return `<div class="item">
+      <div class="thumbcol">${th?`<img src="${th}">`:`<div class="ph">${kind==="sound"?"\u266A":kind==="text"?"\u00B6":"\u2715"}</div>`}
+        <div class="kind">${kind}</div></div>
+      <div class="meta"><div class="rid">${esc(id)}</div>
+        <h3>${esc(r.title||"")}</h3><table>${rows}</table></div></div>`;
+  };
+
+  const sections = groups.map((g,i)=>`<section class="grp">
+      <div class="ghead"><span class="gn">GROUP ${i+1}</span>
+        <h2>${esc(g.heading||"untitled group")}</h2>
+        <div class="gcount">${g.members.length} record${g.members.length===1?"":"s"}</div></div>
+      ${g.members.map(item).join("")}</section>`).join("")
+    + (loose.length?`<section class="grp loose">
+      <div class="ghead"><span class="gn">NOT IN ANY GROUP</span>
+        <h2>Ungrouped</h2>
+        <div class="gcount">${loose.length} record${loose.length===1?"":"s"}</div></div>
+      ${loose.map(item).join("")}</section>`:"");
+
+  return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(hdg)}</title><style>
+  body{font-family:Georgia,serif;color:#14191A;background:#fff;margin:0;padding:46px 54px;line-height:1.5}
+  h1{font-size:27px;font-weight:400;margin:0 0 5px}
+  .sub{font-family:ui-monospace,"Courier New",monospace;font-size:12px;color:#66736F;margin-bottom:34px}
+  section.grp{margin-bottom:34px;padding-top:16px;border-top:2px solid #2E6B55}
+  section.loose{border-top-color:#A8452C}
+  .ghead{margin-bottom:18px}
+  .gn{font-family:ui-monospace,monospace;font-size:10px;letter-spacing:.16em;color:#2E6B55}
+  section.loose .gn{color:#A8452C}
+  .ghead h2{font-size:21px;font-weight:400;margin:3px 0 2px}
+  .gcount{font-family:ui-monospace,monospace;font-size:11px;color:#66736F}
+  .item{display:flex;gap:18px;padding:15px 0;border-bottom:1px solid #DDE4DF;page-break-inside:avoid;break-inside:avoid}
+  .thumbcol{width:132px;flex:0 0 132px}
+  .thumbcol img{width:132px;height:93px;object-fit:cover;display:block;border:1px solid #C3CDC7}
+  .ph{width:132px;height:93px;display:flex;align-items:center;justify-content:center;
+      background:#DDE4DF;color:#66736F;font-size:26px;border:1px solid #C3CDC7}
+  .kind{font-family:ui-monospace,monospace;font-size:10px;color:#66736F;margin-top:5px;text-align:center}
+  .meta{flex:1}
+  .rid{font-family:ui-monospace,monospace;font-size:10px;color:#2E6B55}
+  .meta h3{font-size:16px;font-weight:400;margin:2px 0 9px}
+  table{border-collapse:collapse;width:100%}
+  th{text-align:left;width:150px;font-family:ui-monospace,monospace;font-size:10px;font-weight:400;
+     letter-spacing:.07em;color:#66736F;vertical-align:top;padding:3px 10px 3px 0}
+  td{font-size:13px;vertical-align:top;padding:3px 0}
+  td.absent{color:#9AA5A1;font-style:italic}
+  tr:has(th:only-child){display:none}
+  @media print{ body{padding:0} section.grp{page-break-before:always} section.grp:first-of-type{page-break-before:auto} }
+  </style></head><body>
+  <h1>${esc(hdg)}</h1>
+  <div class="sub">ARTT3005 &nbsp;&middot;&nbsp; ${cards.length} records &nbsp;&middot;&nbsp;
+    ${groups.length} group${groups.length===1?"":"s"} &nbsp;&middot;&nbsp;
+    ${loose.length} ungrouped &nbsp;&middot;&nbsp; ${new Date().toISOString().slice(0,10)}</div>
+  ${sections}</body></html>`;
+}
+
+$("doc").onclick=()=>{
+  if(!cards.length) return;
+  const html=docHTML();
+  const w=window.open("","_blank");
+  if(!w){ alert("Your browser blocked the new window. Allow pop-ups for this page and try again."); return; }
+  w.document.write(`<div style="position:sticky;top:0;background:#14191A;padding:11px 16px;
+      font:13px system-ui,sans-serif;color:#E9EDE9;display:flex;gap:10px;align-items:center;z-index:9">
+      <span style="flex:1">Use <b>Print</b> and choose <b>Save as PDF</b>, or download it to edit in Word.</span>
+      <button onclick="window.print()" style="font:13px inherit;padding:7px 14px;border:0;background:#2E6B55;color:#fff;cursor:pointer">Print / Save as PDF</button>
+      <button id="dw" style="font:13px inherit;padding:7px 14px;background:none;border:1px solid #66736F;color:#E9EDE9;cursor:pointer">Download for Word</button>
+      </div><style>@media print{div[style*="sticky"]{display:none!important}}</style>`);
+  w.document.write(html);
+  w.document.close();
+  w.addEventListener("load",()=>{
+    const b=w.document.getElementById("dw");
+    if(b) b.onclick=()=>{
+      const blob=new Blob(['\ufeff<html xmlns:o="urn:schemas-microsoft-com:office:office" '
+        +'xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">'
+        +html.slice(html.indexOf("<head>")) ], {type:"application/msword"});
+      const a=w.document.createElement("a");
+      a.href=URL.createObjectURL(blob);
+      a.download="board-"+new Date().toISOString().slice(0,10)+".doc"; a.click();
+    };
+  });
+  $("msg").textContent="document opened in a new tab";
+};
+
+/* ── save ── */
+$("save").onclick=()=>{
+  const xs=cards.map(c=>at(c).x), ys=cards.map(c=>at(c).y);
+  const minX=Math.min(...xs), minY=Math.min(...ys);
+  const rx=(Math.max(...xs)-minX)||1, ry=(Math.max(...ys)-minY)||1;
+  const positions={};
+  cards.forEach(c=>{ const p=at(c); positions[c.dataset.id]={
+    x:+((p.x-minX)/rx).toFixed(4), y:+((p.y-minY)/ry).toFixed(4),
+    world_x:Math.round(p.x), world_y:Math.round(p.y) }; });
+  const out={ made_with:"ARTT3005 board",
+    board_heading:$("bh").value.trim()||null,
+    recorder_is:RECKIND, key_mapping:MAP,
+    extra_fields:Object.keys(MAP).filter(k=>!MAP[k]),
+    shown_on_card:$("extraPick").value||null,
+    groups:groups.map(g=>({heading:g.heading,members:g.members})),
+    positions };
+  if(!groups.length&&!confirm("You have not made any groups.\n\nThe headings are the part the machine cannot write. Save anyway?")) return;
+  dl(out,"arrangement.json");
+  $("msg").textContent="saved "+Object.keys(positions).length+" cards";
+};
+$("dlMap").onclick=()=>dl({key_mapping:MAP,recorder_is:RECKIND},"mapping.json");
+function dl(o,name){
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(o,null,2)],{type:"application/json"}));
+  a.download=name; a.click();
+}
+document.addEventListener("change",e=>{ if(e.target.name==="rec") RECKIND=e.target.value; });
+addEventListener("resize",()=>{applyT();drawGroups()});
+</script>
+</body></html>
